@@ -6,11 +6,16 @@ description = "E-commerce core functionality"
 [tool.poetry.dependencies]
 python = "^3.8"
 
-[tool.poetry.dev-dependencies]
+[poetry.group.dev.dependencies]
 pytest = "^7.0"
 flake8 = "^5.0"
 pytest-cov = "^4.0"
+black = "^22.0"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=src --cov-report=html --cov-report=term-missing"
+
+[tool.black]
+line-length = 79
+target-version = ['py38']
