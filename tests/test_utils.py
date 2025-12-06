@@ -1,7 +1,6 @@
 import pytest
-import os
 from src.utils import load_data_from_json
-from src.models import Category, Product
+from src.models import Category
 
 
 class TestUtils:
@@ -10,7 +9,7 @@ class TestUtils:
         Category.category_count = 0
         Category.product_count = 0
 
-        categories = load_data_from_json("products.json")
+        categories = load_data_from_json('products.json')
 
         assert isinstance(categories, list)
         assert len(categories) == 2
@@ -30,7 +29,7 @@ class TestUtils:
         tvs = categories[1]
         assert tvs.name == "Телевизоры"
         assert len(tvs.products) == 1
-        assert tvs.products[0].name == '55" QLED 4K'
+        assert tvs.products[0].name == "55\" QLED 4K"
 
         # Check counters
         assert Category.category_count == 2
@@ -38,20 +37,20 @@ class TestUtils:
 
     def test_load_nonexistent_file(self):
         with pytest.raises(FileNotFoundError):
-            load_data_from_json("nonexistent.json")
+            load_data_from_json('nonexistent.json')
 
     def test_loaded_products_attributes(self):
         Category.category_count = 0
         Category.product_count = 0
 
-        categories = load_data_from_json("products.json")
+        categories = load_data_from_json('products.json')
 
         for category in categories:
             for product in category.products:
-                assert hasattr(product, "name")
-                assert hasattr(product, "description")
-                assert hasattr(product, "price")
-                assert hasattr(product, "quantity")
+                assert hasattr(product, 'name')
+                assert hasattr(product, 'description')
+                assert hasattr(product, 'price')
+                assert hasattr(product, 'quantity')
                 assert isinstance(product.name, str)
                 assert isinstance(product.description, str)
                 assert isinstance(product.price, float)
