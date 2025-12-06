@@ -6,7 +6,7 @@ from src.models import Product, Category
 def sample_products():
     return [
         Product("Product1", "Description1", 100.0, 5),
-        Product("Product2", "Description2", 200.0, 3),
+        Product("Product2", "Description2", 200.0, 3)
     ]
 
 
@@ -34,10 +34,10 @@ class TestProduct:
 
     def test_product_string_representation(self, sample_products):
         product = sample_products[0]
-        assert hasattr(product, "name")
-        assert hasattr(product, "description")
-        assert hasattr(product, "price")
-        assert hasattr(product, "quantity")
+        assert hasattr(product, 'name')
+        assert hasattr(product, 'description')
+        assert hasattr(product, 'price')
+        assert hasattr(product, 'quantity')
 
 
 class TestCategory:
@@ -59,14 +59,16 @@ class TestCategory:
         products1 = [Product("P1", "D1", 100.0, 1)]
         products2 = [
             Product("P2", "D2", 200.0, 2),
-            Product("P3", "D3", 300.0, 3),
+            Product("P3", "D3", 300.0, 3)
         ]
 
         category1 = Category("Cat1", "Desc1", products1)
+        assert category1.name == "Cat1"
         assert Category.category_count == 1
         assert Category.product_count == 1
 
         category2 = Category("Cat2", "Desc2", products2)
+        assert category2.name == "Cat2"
         assert Category.category_count == 2
         assert Category.product_count == 3
 
