@@ -44,13 +44,13 @@ class TestCategory:
     def test_category_initialization(self, sample_category, sample_products):
         assert sample_category.name == "Test Category"
         assert sample_category.description == "Test Description"
-        assert len(sample_category.products) == 2
-        assert sample_category.products == sample_products
+        assert len(sample_category.products_objects) == 2
+        assert sample_category.products_objects == sample_products
 
     def test_category_attributes_types(self, sample_category):
         assert isinstance(sample_category.name, str)
         assert isinstance(sample_category.description, str)
-        assert isinstance(sample_category.products, list)
+        assert isinstance(sample_category.products_objects, list)
 
     def test_counters_increment(self):
         Category.category_count = 0
@@ -78,7 +78,7 @@ class TestCategory:
 
         empty_category = Category("Empty", "No products", [])
         assert empty_category.name == "Empty"
-        assert len(empty_category.products) == 0
+        assert len(empty_category.products_objects) == 0
         assert Category.category_count == 1
         assert Category.product_count == 0
 
@@ -89,7 +89,7 @@ class TestCategory:
         product = Product("Single", "One product", 50.0, 10)
         category = Category("Single", "One product category", [product])
 
-        assert len(category.products) == 1
-        assert category.products[0].name == "Single"
+        assert len(category.products_objects) == 1
+        assert category.products_objects[0].name == "Single"
         assert Category.category_count == 1
         assert Category.product_count == 1

@@ -5,7 +5,6 @@ description = "E-commerce core functionality"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-package-mode = false
 
 [poetry.group.dev.dependencies]
 pytest = "^7.0"

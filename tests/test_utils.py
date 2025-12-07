@@ -5,7 +5,6 @@ from src.models import Category
 
 class TestUtils:
     def test_load_data_from_json(self):
-        # Reset counters
         Category.category_count = 0
         Category.product_count = 0
 
@@ -15,23 +14,20 @@ class TestUtils:
         assert len(categories) == 2
         assert all(isinstance(cat, Category) for cat in categories)
 
-        # Check first category (Smartphones)
         smartphones = categories[0]
         assert smartphones.name == "Смартфоны"
-        assert len(smartphones.products) == 3
+        assert len(smartphones.products_objects) == 3
 
-        # Check products in smartphones category
-        assert smartphones.products[0].name == "Samsung Galaxy C23 Ultra"
-        assert smartphones.products[0].price == 180000.0
-        assert smartphones.products[0].quantity == 5
+        assert (smartphones.products_objects[0].name ==
+                "Samsung Galaxy C23 Ultra")
+        assert smartphones.products_objects[0].price == 180000.0
+        assert smartphones.products_objects[0].quantity == 5
 
-        # Check second category (TVs)
         tvs = categories[1]
         assert tvs.name == "Телевизоры"
-        assert len(tvs.products) == 1
-        assert tvs.products[0].name == "55\" QLED 4K"
+        assert len(tvs.products_objects) == 1
+        assert tvs.products_objects[0].name == "55\" QLED 4K"
 
-        # Check counters
         assert Category.category_count == 2
         assert Category.product_count == 4
 
@@ -46,7 +42,7 @@ class TestUtils:
         categories = load_data_from_json('products.json')
 
         for category in categories:
-            for product in category.products:
+            for product in category.products_objects:
                 assert hasattr(product, 'name')
                 assert hasattr(product, 'description')
                 assert hasattr(product, 'price')

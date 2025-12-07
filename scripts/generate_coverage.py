@@ -43,7 +43,7 @@ def main():
     print(f"\n4. Report generated at: {report_path}")
 
     if input("\nOpen report in browser? (y/n): ").lower() == 'y':
-        webbrowser.open(f"file://{report_path}")
+        webbrowser.open(f"file: //{report_path}")
 
     print("\n" + "=" * 60)
     print("To view the report manually:")
