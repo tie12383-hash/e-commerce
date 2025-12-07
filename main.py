@@ -1,66 +1,79 @@
 from src.models import Product, Category
 
-
 if __name__ == "__main__":
-    product1 = Product(
-        "Samsung Galaxy S23 Ultra",
-        "256GB, Серый цвет, 200MP камера",
-        180000.0,
-        5
-    )
-    product2 = Product(
-        "Iphone 15",
-        "512GB, Gray space",
-        210000.0,
-        8
-    )
-    product3 = Product(
-        "Xiaomi Redmi Note 11",
-        "1024GB, Синий",
-        31000.0,
-        14
-    )
+    print("=== Тестирование новой функциональности ===\n")
 
-    print(product1.name)
-    print(product1.description)
-    print(product1.price)
-    print(product1.quantity)
+    product1 = Product("Samsung Galaxy S23 Ultra",
+                       "256GB, Серый цвет, 200MP камера",
+                       180000.0, 5)
+    product2 = Product("Iphone 15",
+                       "512GB, Gray space",
+                       210000.0, 8)
 
-    print(product2.name)
-    print(product2.description)
-    print(product2.price)
-    print(product2.quantity)
+    category = Category("Смартфоны",
+                        "Смартфоны как средство коммуникации",
+                        [product1])
 
-    print(product3.name)
-    print(product3.description)
-    print(product3.price)
-    print(product3.quantity)
+    print(f"Категория: {category.name}")
+    print(f"Описание: {category.description}")
+    print(f"Товаров в категории: {len(category.products_objects)}")
 
-    category1 = Category(
-        "Смартфоны",
-        "Смартфоны, как средство не только коммуникации, "
-        "но и получения дополнительных функций для удобства жизни",
-        [product1, product2, product3]
-    )
+    category.add_product(product2)
+    print(f"После добавления товаров: {len(category.products_objects)}")
 
-    print(category1.name == "Смартфоны")
-    print(category1.description)
-    print(len(category1.products))
-    print(category1.category_count)
-    print(category1.product_count)
+    print("\nСписок товаров:")
+    for product_str in category.products:
+        print(f"  {product_str}")
 
-    product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
-    category2 = Category(
-        "Телевизоры",
-        "Современный телевизор, который позволяет наслаждаться просмотром, "
-        "станет вашим другом и помощником",
-        [product4]
-    )
+    print("\n=== Тестирование класса-метода new_product ===")
 
-    print(category2.name)
-    print(category2.description)
-    print(len(category2.products))
-    print(category2.products)
+    product_data = {
+        'name': 'Xiaomi Redmi Note 11',
+        'description': '1024GB, Синий',
+        'price': 31000.0,
+        'quantity': 14
+    }
 
-    print(Category.category_count)
-    print(Category.product_count)
+    products_list = category.products_objects
+    product3 = Product.new_product(product_data, products_list)
+
+    category.add_product(product3)
+
+    print(f"\nПосле добавления через new_product: {len(category.products)}")
+    for product_str in category.products:
+        print(f"  {product_str}")
+
+    print("\n=== Тестирование сеттера цены ===")
+
+    print(f"Текущая цена продукта 1: {product1.price}")
+
+    print("\nПопытка установить отрицательную цену:")
+    product1.price = -100
+    print(f"Цена после попытки: {product1.price}")
+
+    print("\nПопытка установить нулевую цену:")
+    product1.price = 0
+    print(f"Цена после попытки: {product1.price}")
+
+    print("\nУстановка корректной цены:")
+    product1.price = 190000.0
+    print(f"Цена после установки: {product1.price}")
+
+    print("\n=== Счетчики ===")
+    print(f"Всего категорий: {Category.category_count}")
+    print(f"Всего товаров: {Category.product_count}")
+
+    print("\n=== Тестирование обработки дубликатов ===")
+
+    duplicate_data = {
+        'name': 'Samsung Galaxy S23 Ultra',
+        'description': 'Новое описание',
+        'price': 200000.0,
+        'quantity': 3
+    }
+
+    product4 = Product.new_product(duplicate_data, category.products_objects)
+    print("\nПосле обработки дубликата: ")
+    print(f"  Количество товаров в категории: {len(category.products)}")
+    print(f"  Цена обновленного товара: {product1.price} руб.")
+    print(f"  Количество обновленного товара: {product1.quantity} шт.")
