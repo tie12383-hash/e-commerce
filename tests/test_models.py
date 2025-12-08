@@ -39,6 +39,14 @@ class TestProduct:
         assert hasattr(product, 'price')
         assert hasattr(product, 'quantity')
 
+    def test_price_is_private(self):
+        product = Product("Test", "Test", 100.0, 5)
+
+        assert hasattr(product, '_Product__price')
+
+        with pytest.raises(AttributeError):
+            _ = product.__price
+
 
 class TestCategory:
     def test_category_initialization(self, sample_category, sample_products):

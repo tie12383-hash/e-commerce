@@ -41,14 +41,13 @@ class TestAddProductMethod:
 
 class TestProductsGetter:
 
-    def test_products_getter_returns_strings(self):
+    def test_products_getter_returns_string(self):
         product = Product("Товар", "Описание", 80.0, 15)
         category = Category("Категория", "Описание", [product])
 
         result = category.products
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert "Товар, 80 руб. Остаток: 15 шт." == result[0]
+        assert isinstance(result, str)
+        assert "Товар, 80 руб. Остаток: 15 шт." in result
 
     def test_products_getter_with_multiple_products(self):
         products = [
@@ -58,9 +57,10 @@ class TestProductsGetter:
         category = Category("Категория", "Описание", products)
 
         result = category.products
-        assert len(result) == 2
-        assert "Товар1, 100 руб. Остаток: 5 шт." == result[0]
-        assert "Товар2, 200 руб. Остаток: 10 шт." == result[1]
+        assert isinstance(result, str)
+        assert "Товар1, 100 руб. Остаток: 5 шт." in result
+        assert "Товар2, 200 руб. Остаток: 10 шт." in result
+        assert result.count('\n') == 1
 
 
 class TestNewProductClassMethod:
@@ -80,32 +80,22 @@ class TestNewProductClassMethod:
         assert product.price == 100.0
         assert product.quantity == 5
 
-    def test_new_product_handles_duplicates(self):
-        products_list = []
-
-        product_data1 = {
+    def test_new_product_accepts_only_dict(self):
+        product_data = {
             'name': 'Товар',
-            'description': 'Описание1',
+            'description': 'Описание',
             'price': 100.0,
             'quantity': 5
         }
 
-        product1 = Product.new_product(product_data1, products_list)
-        products_list.append(product1)
+        product = Product.new_product(product_data)
+        assert isinstance(product, Product)
 
-        product_data2 = {
-            'name': 'Товар',
-            'description': 'Описание2',
-            'price': 150.0,
-            'quantity': 3
-        }
+        with pytest.raises(TypeError):
+            Product.new_product("not a dict")
 
-        product2 = Product.new_product(product_data2, products_list)
-
-        assert product2 is product1
-        assert product1.quantity == 8
-        assert product1.price == 150.0
-        assert len(products_list) == 1
+        with pytest.raises(TypeError):
+            Product.new_product(['name', 'Товар'])
 
 
 class TestPriceGetterSetter:
@@ -125,7 +115,7 @@ class TestPriceGetterSetter:
 
         captured = capsys.readouterr()
         assert "Цена не должна быть нулевая или отрицательная" in captured.out
-        assert product.price == 100.0  # Цена не изменилась
+        assert product.price == 100.0
 
     def test_price_setter_negative_value(self, capsys):
         product = Product("Товар", "Описание", 100.0, 5)
@@ -159,6 +149,16 @@ class TestPriceGetterSetter:
 
         assert product.price == 150.0
 
+    def test_price_is_truly_private(self):
+        product = Product("Товар", "Описание", 100.0, 5)
+
+        assert hasattr(product, '_Product__price')
+
+        with pytest.raises(AttributeError):
+            _ = product.__price
+
+        assert product.price == 100.0
+
 
 class TestIntegration:
 
@@ -179,5 +179,6 @@ class TestIntegration:
         assert Category.product_count == 2
 
         products_str = category.products
-        assert "Товар1, 100 руб. Остаток: 10 шт." == products_str[0]
-        assert "Товар2, 200 руб. Остаток: 5 шт." == products_str[1]
+        assert isinstance(products_str, str)
+        assert "Товар1, 100 руб. Остаток: 10 шт." in products_str
+        assert "Товар2, 200 руб. Остаток: 5 шт." in products_str
