@@ -3,23 +3,11 @@ class Product:
                  price: float, quantity: int):
         self.name = name
         self.description = description
-        self._price = price
+        self.__price = price
         self.quantity = quantity
 
     @classmethod
-    def new_product(cls, product_data: dict, products_list: list = None):
-        if products_list is None:
-            products_list = []
-
-        for existing_product in products_list:
-            if existing_product.name.lower() == product_data['name'].lower():
-                existing_product.quantity += product_data['quantity']
-
-                if product_data['price'] > existing_product.price:
-                    existing_product.price = product_data['price']
-
-                return existing_product
-
+    def new_product(cls, product_data: dict):
         return cls(
             name=product_data['name'],
             description=product_data['description'],
@@ -29,12 +17,12 @@ class Product:
 
     @property
     def price(self):
-        return self._price
+        return self.__price
 
     @price.setter
     def price(self, new_price: float):
-        if hasattr(self, '_price'):
-            current_price = self._price
+        if hasattr(self, '_Product__price'):
+            current_price = self.__price
         else:
             current_price = 0
 
@@ -51,7 +39,7 @@ class Product:
                 print("Изменение цены отменено")
                 return
 
-        self._price = new_price
+        self.__price = new_price
 
 
 class Category:
@@ -75,17 +63,16 @@ class Category:
 
     @property
     def products(self):
-        products_list = []
+        result = ""
         for product in self.__products:
-            price_str = str(product.price)
-            if price_str.endswith('.0'):
-                price_str = price_str[:-2]
+            if float(product.price).is_integer():
+                price_str = str(int(product.price))
+            else:
+                price_str = str(product.price)
 
-            products_list.append(
-                f"{product.name}, {price_str} руб. "
-                f"Остаток: {product.quantity} шт."
-            )
-        return products_list
+            result += (f"{product.name}, {price_str} руб. "
+                       f"Остаток: {product.quantity} шт.\n")
+        return result.strip()
 
     @property
     def products_objects(self):
