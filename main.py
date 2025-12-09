@@ -22,7 +22,7 @@ if __name__ == "__main__":
     print(f"После добавления товаров: {len(category.products_objects)}")
 
     print("\nСписок товаров:")
-    for product_str in category.products:
+    for product_str in category.products.split('\n'):
         print(f"  {product_str}")
 
     print("\n=== Тестирование класса-метода new_product ===")
@@ -39,9 +39,22 @@ if __name__ == "__main__":
 
     category.add_product(product3)
 
-    print(f"\nПосле добавления через new_product: {len(category.products)}")
-    for product_str in category.products:
-        print(f"  {product_str}")
+    print(f"\nПосле добавления через new_product: "
+          f"{len(category.products_objects)}")
+    for product in category:
+        print(f"  {product}")
+
+    print("\n=== Тестирование магического метода __str__ ===")
+    print(f"Строковое представление продукта: {product1}")
+    print(f"Строковое представление категории: {category}")
+
+    print("\n=== Тестирование магического метода __add__ ===")
+    print(f"Стоимость всех {product1.name}: "
+          f"{product1.price * product1.quantity} руб.")
+    print(f"Стоимость всех {product2.name}: "
+          f"{product2.price * product2.quantity} руб.")
+    print(f"Общая стоимость {product1.name} и {product2.name}: "
+          f"{product1 + product2} руб.")
 
     print("\n=== Тестирование сеттера цены ===")
 
@@ -59,6 +72,11 @@ if __name__ == "__main__":
     product1.price = 190000.0
     print(f"Цена после установки: {product1.price}")
 
+    print("\n=== Тестирование итератора категории ===")
+    print("Итерация по товарам в категории:")
+    for i, product in enumerate(category, 1):
+        print(f"  Товар {i}: {product.name}")
+
     print("\n=== Счетчики ===")
     print(f"Всего категорий: {Category.category_count}")
     print(f"Всего товаров: {Category.product_count}")
@@ -74,6 +92,8 @@ if __name__ == "__main__":
 
     product4 = Product.new_product(duplicate_data, category.products_objects)
     print("\nПосле обработки дубликата: ")
-    print(f"  Количество товаров в категории: {len(category.products)}")
+    print(f"  Количество товаров в категории: "
+          f"{len(category.products_objects)}")
     print(f"  Цена обновленного товара: {product1.price} руб.")
     print(f"  Количество обновленного товара: {product1.quantity} шт.")
+    print(f"  Строковое представление обновленного товара: {product1}")
