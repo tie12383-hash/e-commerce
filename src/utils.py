@@ -1,8 +1,9 @@
 import json
+from typing import List
 from .models import Category, Product
 
 
-def load_data_from_json(file_path: str) -> list[Category]:
+def load_data_from_json(file_path: str) -> List[Category]:
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
