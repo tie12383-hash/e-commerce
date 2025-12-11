@@ -1,20 +1,21 @@
 from typing import Any, List
+from .abstracts import BaseProduct, BaseContainer
+from .mixins import ReprMixin
 
 
-class Product:
+class Product(ReprMixin, BaseProduct):
 
     def __init__(self, name: str, description: str,
                  price: float, quantity: int):
-        self.name = name
-        self.description = description
         self.__price = price
         self.quantity = quantity
+        super().__init__(name, description, price, quantity)
 
     @classmethod
     def new_product(
-        cls,
-        product_data: dict,
-        products_list: List['Product'] = None
+            cls,
+            product_data: dict,
+            products_list: List['Product'] = None
     ) -> 'Product':
         base_product_data = {
             'name': product_data['name'],
@@ -37,7 +38,6 @@ class Product:
                     product.price = new_price
 
                 product.quantity += product_data.get('quantity', 0)
-
                 return product
 
         return cls(**base_product_data)
@@ -91,27 +91,27 @@ class Product:
 class Smartphone(Product):
 
     def __init__(
-        self,
-        name: str,
-        description: str,
-        price: float,
-        quantity: int,
-        efficiency: float,
-        model: str,
-        memory: int,
-        color: str
+            self,
+            name: str,
+            description: str,
+            price: float,
+            quantity: int,
+            efficiency: float,
+            model: str,
+            memory: int,
+            color: str
     ):
-        super().__init__(name, description, price, quantity)
         self.efficiency = efficiency
         self.model = model
         self.memory = memory
         self.color = color
+        super().__init__(name, description, price, quantity)
 
     @classmethod
     def new_product(
-        cls,
-        product_data: dict,
-        products_list: List['Product'] = None
+            cls,
+            product_data: dict,
+            products_list: List['Product'] = None
     ) -> 'Smartphone':
         smartphone_data = {
             'name': product_data['name'],
@@ -160,25 +160,25 @@ class Smartphone(Product):
 class LawnGrass(Product):
 
     def __init__(
-        self,
-        name: str,
-        description: str,
-        price: float,
-        quantity: int,
-        country: str,
-        germination_period: int,
-        color: str
+            self,
+            name: str,
+            description: str,
+            price: float,
+            quantity: int,
+            country: str,
+            germination_period: int,
+            color: str
     ):
-        super().__init__(name, description, price, quantity)
         self.country = country
         self.germination_period = germination_period
         self.color = color
+        super().__init__(name, description, price, quantity)
 
     @classmethod
     def new_product(
-        cls,
-        product_data: dict,
-        products_list: List['Product'] = None
+            cls,
+            product_data: dict,
+            products_list: List['Product'] = None
     ) -> 'LawnGrass':
         grass_data = {
             'name': product_data['name'],
@@ -225,25 +225,20 @@ class LawnGrass(Product):
                 f"Цвет: {self.color})")
 
 
-class Category:
+class Category(BaseContainer):
 
     category_count = 0
     product_count = 0
 
     def __init__(self, name: str, description: str, products: List[Product]):
-        self.name = name
-        self.description = description
         self.__products = products
+        super().__init__(name, description)
 
         Category.category_count += 1
         Category.product_count += len(products)
 
     def add_product(self, product: Product) -> None:
         if not isinstance(product, Product):
-            msg = "Можно добавлять только объекты класса Product"
-            raise TypeError(msg)
-
-        if not issubclass(type(product), Product):
             msg = "Можно добавлять только объекты класса Product"
             raise TypeError(msg)
 
@@ -258,12 +253,58 @@ class Category:
     def products_objects(self) -> List[Product]:
         return self.__products
 
+    @property
+    def total_cost(self) -> float:
+        return sum(product.price * product.quantity
+                   for product in self.__products)
+
+    @property
+    def total_quantity(self) -> int:
+        return sum(product.quantity for product in self.__products)
+
     def __str__(self) -> str:
-        total_quantity = sum(product.quantity for product in self.__products)
-        return f"{self.name}, количество продуктов: {total_quantity} шт."
+        return f"{self.name}, количество продуктов: {self.total_quantity} шт."
 
     def __iter__(self):
         return CategoryIterator(self.__products)
+
+
+class Order(BaseContainer):
+
+    order_count = 0
+
+    def __init__(self, name: str, description: str,
+                 product: Product, quantity: int):
+        self.product = product
+        self.order_quantity = quantity
+        super().__init__(name, description)
+
+        Order.order_count += 1
+
+        if quantity > product.quantity:
+            raise ValueError(f"Недостаточно товара '{product.name}'. "
+                             f"Доступно: {product.quantity}, "
+                             f"запрошено: {quantity}")
+
+    @property
+    def total_cost(self) -> float:
+        return self.product.price * self.order_quantity
+
+    @property
+    def total_quantity(self) -> int:
+        return self.order_quantity
+
+    def __str__(self) -> str:
+        return (f"Заказ: {self.name}\n"
+                f"Товар: {self.product.name}\n"
+                f"Количество: {self.order_quantity} шт.\n"
+                f"Общая стоимость: {self.total_cost} руб.")
+
+    def process_order(self) -> None:
+        self.product.quantity -= self.order_quantity
+        print(f"Заказ '{self.name}' обработан. "
+              f"Остаток товара '{self.product.name}': "
+              f"{self.product.quantity} шт.")
 
 
 class CategoryIterator:
