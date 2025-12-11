@@ -1,8 +1,8 @@
-from src.models import Product, Smartphone, LawnGrass, Category
+from src.models import Product, Smartphone, LawnGrass, Category, Order
 
 if __name__ == "__main__":
     print("=== Тестирование новой функциональности "
-          "с классами-наследниками ===\n")
+          "с классами-наследниками и абстрактными классами ===\n")
 
     print("=== Создание объектов разных классов ===")
 
@@ -34,56 +34,16 @@ if __name__ == "__main__":
         color="Зеленый"
     )
 
-    print(f"1. Базовый продукт: {base_product}")
+    print(f"\n1. Базовый продукт: {base_product}")
     print(f"2. Смартфон: {smartphone}")
     print(f"3. Газонная трава: {lawn_grass}")
 
-    print("\n=== Тестирование сложения продуктов ===")
+    print("\n=== Тестирование __repr__ ===")
+    print(f"Repr базового продукта: {repr(base_product)}")
+    print(f"Repr смартфона: {repr(smartphone)}")
+    print(f"Repr газонной травы: {repr(lawn_grass)}")
 
-    print("1. Сложение двух смартфонов:")
-    smartphone2 = Smartphone(
-        "Samsung Galaxy S23",
-        "Android смартфон",
-        80000.0,
-        3,
-        efficiency=3.2,
-        model="Galaxy S23",
-        memory=128,
-        color="Черный"
-    )
-
-    try:
-        total_smartphones = smartphone + smartphone2
-        print(f"   Общая стоимость смартфонов: {total_smartphones} руб.")
-        print(f"   Расчет: ({smartphone.price} × {smartphone.quantity}) + "
-              f"({smartphone2.price} × {smartphone2.quantity})")
-    except TypeError as e:
-        print(f"   Ошибка: {e}")
-
-    print("\n2. Сложение базовых продуктов (должно работать):")
-    base_product2 = Product("Другой товар", "Описание", 300.0, 8)
-    try:
-        total_base = base_product + base_product2
-        print(f"   Общая стоимость базовых товаров: {total_base} руб.")
-    except TypeError as e:
-        print(f"   Ошибка: {e}")
-
-    print("\n3. Сложение разных классов (должно вызвать ошибку):")
-    try:
-        invalid_total = smartphone + lawn_grass
-        print(f"   Результат: {invalid_total} руб.")
-    except TypeError as e:
-        print(f"   Ожидаемая ошибка: {e}")
-
-    print("\n4. Сложение продукта с числом (должно вызвать ошибку):")
-    try:
-        invalid_total = smartphone + 100
-        print(f"   Результат: {invalid_total} руб.")
-    except TypeError as e:
-        print(f"   Ожидаемая ошибка: {e}")
-
-    print("\n=== Тестирование категорий ===")
-
+    print("\n=== Создание категории ===")
     category = Category(
         "Разные товары",
         "Категория содержит товары разных типов",
@@ -91,68 +51,38 @@ if __name__ == "__main__":
     )
 
     print(f"Категория: {category}")
-    print(f"Количество товаров в категории: {len(category.products_objects)}")
+    print(f"Общая стоимость категории: {category.total_cost} руб.")
 
-    print("\n=== Добавление нового продукта в категорию ===")
-
-    new_smartphone = Smartphone(
-        "Xiaomi 13",
-        "Китайский смартфон",
-        60000.0,
-        8,
-        efficiency=3.0,
-        model="13",
-        memory=256,
-        color="Синий"
-    )
-
-    category.add_product(new_smartphone)
-    print(f"После добавления смартфона: "
-          f"{len(category.products_objects)} товаров")
-
-    print("\n=== Попытка добавить не-продукт в категорию ===")
+    print("\n=== Создание заказа ===")
     try:
-        category.add_product("не продукт")
-    except TypeError as e:
-        print(f"Ожидаемая ошибка: {e}")
+        order = Order(
+            name="Мой первый заказ",
+            description="Заказ iPhone 15 Pro",
+            product=smartphone,
+            quantity=2
+        )
 
-    print("\n=== Итерация по товарам в категории ===")
-    print("Список товаров:")
-    for i, product in enumerate(category, 1):
-        print(f"  {i}. {product}")
+        print("Заказ создан успешно:")
+        print(order)
 
-    print("\n=== Тестирование isinstance и issubclass ===")
+        print("\n=== Обработка заказа ===")
+        order.process_order()
 
-    print("1. Проверка isinstance:")
-    print(f"   smartphone является Smartphone: "
-          f"{isinstance(smartphone, Smartphone)}")
-    print(f"   smartphone является Product: "
-          f"{isinstance(smartphone, Product)}")
-    print(f"   smartphone является LawnGrass: "
-          f"{isinstance(smartphone, LawnGrass)}")
+    except ValueError as e:
+        print(f"Ошибка создания заказа: {e}")
 
-    print("\n2. Проверка issubclass:")
-    print(f"   Smartphone является подклассом Product: "
-          f"{issubclass(Smartphone, Product)}")
-    print(f"   LawnGrass является подклассом Product: "
-          f"{issubclass(LawnGrass, Product)}")
-    print(f"   Smartphone является подклассом LawnGrass: "
-          f"{issubclass(Smartphone, LawnGrass)}")
-
-    print("\n=== Тестирование сеттера цены ===")
-    print(f"Текущая цена смартфона: {smartphone.price} руб.")
-
-    print("Попытка установить отрицательную цену:")
-    smartphone.price = -100
-    print(f"Цена после попытки: {smartphone.price} руб.")
-
-    print("Установка корректной цены:")
-    smartphone.price = 125000.0
-    print(f"Цена после установки: {smartphone.price} руб.")
+    print("\n=== Проверка абстрактных классов ===")
+    print(f"Product является экземпляром BaseProduct: "
+          f"{isinstance(base_product, Product)}")
+    print(f"Category является экземпляром BaseContainer: "
+          f"{isinstance(category, Category)}")
+    print(f"Order является экземпляром BaseContainer: "
+          f"{isinstance(order, Order)}")
 
     print("\n=== Счетчики ===")
     print(f"Всего категорий: {Category.category_count}")
     print(f"Всего товаров: {Category.product_count}")
+    print(f"Всего заказов: {Order.order_count}")
 
     print("\n=== Тестирование метода new_product ===")
 
@@ -163,7 +93,8 @@ if __name__ == "__main__":
         'quantity': 7
     }
 
-    new_product = Product.new_product(product_data, category.products_objects)
+    new_product = Product.new_product(product_data,
+                                      category.products_objects)
     print(f"Создан новый продукт: {new_product}")
 
     print("\n=== Проверка обработки дубликатов для смартфона ===")
