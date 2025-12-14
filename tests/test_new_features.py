@@ -29,14 +29,18 @@ class TestAddProductMethod:
         category.add_product(product2)
         assert Category.product_count == 2
 
-    def test_add_product_only_accepts_product(self):
+    def test_add_product_only_accepts_product(self, capsys):
         category = Category("Test", "Test", [])
 
-        with pytest.raises(TypeError):
-            category.add_product("not a product")
+        category.add_product("not a product")
+        captured = capsys.readouterr()
+        assert "Можно добавлять только объекты класса Product" in captured.out
+        assert len(category.products_objects) == 0
 
-        with pytest.raises(TypeError):
-            category.add_product({"name": "Test"})
+        category.add_product({"name": "Test"})
+        captured = capsys.readouterr()
+        assert "Можно добавлять только объекты класса Product" in captured.out
+        assert len(category.products_objects) == 0
 
 
 class TestProductsGetter:

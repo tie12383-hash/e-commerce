@@ -77,15 +77,6 @@ class TestProductAddMethod:
 
         assert result1 == result2
 
-    def test_product_add_zero_quantity(self):
-        product1 = Product("Товар1", "Описание1", 100.0, 0)
-        product2 = Product("Товар2", "Описание2", 200.0, 5)
-
-        result = product1 + product2
-        expected = (100.0 * 0) + (200.0 * 5)
-
-        assert result == expected
-
     def test_product_add_zero_price(self):
         product1 = Product("Товар1", "Описание1", 0.0, 10)
         product2 = Product("Товар2", "Описание2", 200.0, 5)
@@ -231,8 +222,9 @@ class TestEdgeCases:
 
     def test_category_str_with_none_products(self):
         category = Category("Категория", "Описание", [])
-        product = Product("Товар", "Описание", 100.0, 0)
+        product = Product("Товар", "Описание", 100.0, 1)
         category._Category__products.append(product)
+        product.quantity = 0
 
         assert str(category) == "Категория, количество продуктов: 0 шт."
 

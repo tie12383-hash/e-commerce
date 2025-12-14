@@ -170,7 +170,6 @@ class TestProductAddRestrictions:
         assert msg in str(exc_info.value)
 
     def test_add_base_product_with_smartphone_raises_error(self):
-        """Тест сложения базового продукта со смартфоном"""
         base_product = Product("Base", "Desc", 100.0, 5)
         smartphone = Smartphone(
             name="Phone",
@@ -190,7 +189,6 @@ class TestProductAddRestrictions:
         assert msg in str(exc_info.value)
 
     def test_add_with_non_product_raises_error(self):
-        """Тест сложения продукта с не-продуктом"""
         smartphone = Smartphone(
             name="Phone",
             description="Desc",
@@ -247,29 +245,36 @@ class TestCategoryAddProductRestrictions:
 
         assert len(category.products_objects) == 3
 
-    def test_add_non_product_raises_error(self):
-        """Тест добавления не-продукта вызывает ошибку"""
+    def test_add_non_product_raises_error(self, capsys):
         category = Category("Техника", "Описание", [])
 
-        with pytest.raises(TypeError) as exc_info:
-            category.add_product("не продукт")
+        category.add_product("не продукт")
+        captured = capsys.readouterr()
         msg = "Можно добавлять только объекты класса Product"
-        assert msg in str(exc_info.value)
+        assert msg in captured.out
+        assert len(category.products_objects) == 0
 
-        with pytest.raises(TypeError):
-            category.add_product(123)
+        category.add_product(123)
+        captured = capsys.readouterr()
+        assert msg in captured.out
+        assert len(category.products_objects) == 0
 
-        with pytest.raises(TypeError):
-            category.add_product({"name": "Test"})
+        category.add_product({"name": "Test"})
+        captured = capsys.readouterr()
+        assert msg in captured.out
+        assert len(category.products_objects) == 0
 
-        with pytest.raises(TypeError):
-            category.add_product([1, 2, 3])
+        category.add_product([1, 2, 3])
+        captured = capsys.readouterr()
+        assert msg in captured.out
+        assert len(category.products_objects) == 0
 
-        with pytest.raises(TypeError):
-            category.add_product(None)
+        category.add_product(None)
+        captured = capsys.readouterr()
+        assert msg in captured.out
+        assert len(category.products_objects) == 0
 
     def test_add_product_increases_counters(self):
-        """Тест увеличения счетчиков при добавлении продукта"""
         Category.category_count = 0
         Category.product_count = 0
 
@@ -409,7 +414,6 @@ class TestMixedCategoryOperations:
         assert product_names == ["Обычный товар", "Смартфон", "Трава"]
 
     def test_category_str_with_mixed_products(self):
-        """Тест строкового представления категории"""
         base_product = Product("Товар1", "Описание", 100.0, 5)
         smartphone = Smartphone(
             name="Товар2",
@@ -544,7 +548,6 @@ class TestEdgeCases:
         assert smartphone.price == 150.0
 
     def test_empty_category_with_inherited_classes(self):
-        """Тест пустой категории с добавлением наследников"""
         category = Category("Пустая", "Описание", [])
 
         assert len(category.products_objects) == 0
@@ -565,7 +568,6 @@ class TestEdgeCases:
         assert isinstance(category.products_objects[0], Smartphone)
 
     def test_new_product_duplicate_update_for_smartphone(self):
-        """Тест обновления дубликата для смартфона"""
         smartphone = Smartphone(
             name="iPhone",
             description="Старое описание",

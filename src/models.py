@@ -1,12 +1,16 @@
 from typing import Any, List
 from .abstracts import BaseProduct, BaseContainer
 from .mixins import ReprMixin
+from .exceptions import ZeroQuantityError, EmptyCategoryError
 
 
 class Product(ReprMixin, BaseProduct):
 
     def __init__(self, name: str, description: str,
                  price: float, quantity: int):
+        if quantity == 0:
+            raise ZeroQuantityError()
+
         self.__price = price
         self.quantity = quantity
         super().__init__(name, description, price, quantity)
@@ -238,12 +242,40 @@ class Category(BaseContainer):
         Category.product_count += len(products)
 
     def add_product(self, product: Product) -> None:
-        if not isinstance(product, Product):
-            msg = "Можно добавлять только объекты класса Product"
-            raise TypeError(msg)
+        try:
+            if not isinstance(product, Product):
+                msg = "Можно добавлять только объекты класса Product"
+                raise TypeError(msg)
 
-        self.__products.append(product)
-        Category.product_count += 1
+            if product.quantity == 0:
+                raise ZeroQuantityError()
+
+        except ZeroQuantityError as e:
+            print(f"Ошибка: {e}")
+        except TypeError as e:
+            print(f"Ошибка: {e}")
+        else:
+            self.__products.append(product)
+            Category.product_count += 1
+            print("Товар успешно добавлен")
+        finally:
+            print("Обработка добавления товара завершена")
+
+    def average_price(self) -> float:
+        try:
+            if len(self.__products) == 0:
+                raise EmptyCategoryError()
+
+            total_price = sum(product.price for product in self.__products)
+            average = total_price / len(self.__products)
+            return average
+
+        except ZeroDivisionError:
+            print("Ошибка: Деление на ноль при расчете средней цены")
+            return 0
+        except EmptyCategoryError as e:
+            print(f"Ошибка: {e}")
+            return 0
 
     @property
     def products(self) -> str:
@@ -275,16 +307,30 @@ class Order(BaseContainer):
 
     def __init__(self, name: str, description: str,
                  product: Product, quantity: int):
-        self.product = product
-        self.order_quantity = quantity
-        super().__init__(name, description)
+        try:
+            if quantity == 0:
+                raise ZeroQuantityError(
+                    "Количество товара в заказе не может быть нулевым"
+                )
 
-        Order.order_count += 1
+            if quantity > product.quantity:
+                raise ValueError(
+                    f"Недостаточно товара '{product.name}'. "
+                    f"Доступно: {product.quantity}, "
+                    f"запрошено: {quantity}"
+                )
 
-        if quantity > product.quantity:
-            raise ValueError(f"Недостаточно товара '{product.name}'. "
-                             f"Доступно: {product.quantity}, "
-                             f"запрошено: {quantity}")
+        except (ZeroQuantityError, ValueError) as e:
+            print(f"Ошибка создания заказа: {e}")
+            raise
+        else:
+            self.product = product
+            self.order_quantity = quantity
+            super().__init__(name, description)
+            Order.order_count += 1
+            print("Заказ успешно создан")
+        finally:
+            print("Обработка создания заказа завершена")
 
     @property
     def total_cost(self) -> float:
@@ -301,10 +347,23 @@ class Order(BaseContainer):
                 f"Общая стоимость: {self.total_cost} руб.")
 
     def process_order(self) -> None:
-        self.product.quantity -= self.order_quantity
-        print(f"Заказ '{self.name}' обработан. "
-              f"Остаток товара '{self.product.name}': "
-              f"{self.product.quantity} шт.")
+        try:
+            if self.order_quantity > self.product.quantity:
+                raise ValueError(
+                    f"Недостаточно товара '{self.product.name}'. "
+                    f"Доступно: {self.product.quantity}, "
+                    f"запрошено: {self.order_quantity}"
+                )
+
+        except ValueError as e:
+            print(f"Ошибка обработки заказа: {e}")
+        else:
+            self.product.quantity -= self.order_quantity
+            print(f"Заказ '{self.name}' успешно обработан. "
+                  f"Остаток товара '{self.product.name}': "
+                  f"{self.product.quantity} шт.")
+        finally:
+            print("Обработка заказа завершена")
 
 
 class CategoryIterator:
