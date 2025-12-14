@@ -1,123 +1,65 @@
-from src.models import Product, Smartphone, LawnGrass, Category, Order
+from src.models import Product, Category, Order
+from src.exceptions import ZeroQuantityError
 
 if __name__ == "__main__":
-    print("=== Тестирование новой функциональности "
-          "с классами-наследниками и абстрактными классами ===\n")
+    print("=== Тестирование обработки исключений ===\n")
 
-    print("=== Создание объектов разных классов ===")
+    print("=== Создание продукта с нулевым количеством ===")
+    try:
+        product = Product("Товар с нулем", "Описание", 100.0, 0)
+    except ZeroQuantityError as e:
+        print(f"Поймано исключение: {e}")
+    else:
+        print("Продукт создан успешно")
 
-    base_product = Product(
-        "Обычный товар",
-        "Просто товар без специфических характеристик",
-        500.0,
-        10
-    )
+    print("\n=== Создание продукта с нормальным количеством ===")
+    try:
+        product = Product("Нормальный товар", "Описание", 100.0, 5)
+    except ZeroQuantityError as e:
+        print(f"Поймано исключение: {e}")
+    else:
+        print("Продукт создан успешно")
 
-    smartphone = Smartphone(
-        "iPhone 15 Pro",
-        "Флагманский смартфон Apple",
-        120000.0,
-        5,
-        efficiency=3.5,
-        model="iPhone 15 Pro",
-        memory=256,
-        color="Титан"
-    )
+    print("\n=== Создание и работа с категорией ===")
+    category = Category("Техника", "Электроника", [])
 
-    lawn_grass = LawnGrass(
-        "Газонная трава Премиум",
-        "Мягкая трава для газонов",
-        800.0,
-        20,
-        country="Россия",
-        germination_period=14,
-        color="Зеленый"
-    )
+    print("Добавление товаров в категорию:")
+    product1 = Product("Товар1", "Описание1", 100.0, 3)
+    category.add_product(product1)
 
-    print(f"\n1. Базовый продукт: {base_product}")
-    print(f"2. Смартфон: {smartphone}")
-    print(f"3. Газонная трава: {lawn_grass}")
+    product2 = Product("Товар2", "Описание2", 200.0, 2)
+    category.add_product(product2)
 
-    print("\n=== Тестирование __repr__ ===")
-    print(f"Repr базового продукта: {repr(base_product)}")
-    print(f"Repr смартфона: {repr(smartphone)}")
-    print(f"Repr газонной травы: {repr(lawn_grass)}")
+    print(f"\nСредняя цена в категории: {category.average_price()} руб.")
+    print(f"Общее количество товаров: {category.total_quantity} шт.")
 
-    print("\n=== Создание категории ===")
-    category = Category(
-        "Разные товары",
-        "Категория содержит товары разных типов",
-        [base_product, smartphone, lawn_grass]
-    )
-
-    print(f"Категория: {category}")
-    print(f"Общая стоимость категории: {category.total_cost} руб.")
+    print("\n=== Работа с пустой категорией ===")
+    empty_category = Category("Пустая", "Описание", [])
+    print(f"Средняя цена пустой категории: {empty_category.average_price()}")
 
     print("\n=== Создание заказа ===")
     try:
-        order = Order(
-            name="Мой первый заказ",
-            description="Заказ iPhone 15 Pro",
-            product=smartphone,
-            quantity=2
-        )
+        order1 = Order("Заказ1", "Первый заказ", product1, 0)
+    except Exception as e:
+        print(f"Заказ не создан: {type(e).__name__} - {e}")
 
-        print("Заказ создан успешно:")
-        print(order)
+    try:
+        order2 = Order("Заказ2", "Второй заказ", product1, 10)
+    except Exception as e:
+        print(f"Заказ не создан: {type(e).__name__} - {e}")
 
-        print("\n=== Обработка заказа ===")
-        order.process_order()
+    try:
+        order3 = Order("Заказ3", "Третий заказ", product1, 2)
+        print(f"Заказ создан успешно: {order3}")
+    except Exception as e:
+        print(f"Заказ не создан: {type(e).__name__} - {e}")
 
-    except ValueError as e:
-        print(f"Ошибка создания заказа: {e}")
-
-    print("\n=== Проверка абстрактных классов ===")
-    print(f"Product является экземпляром BaseProduct: "
-          f"{isinstance(base_product, Product)}")
-    print(f"Category является экземпляром BaseContainer: "
-          f"{isinstance(category, Category)}")
-    print(f"Order является экземпляром BaseContainer: "
-          f"{isinstance(order, Order)}")
+    print("\n=== Обработка заказов ===")
+    if 'order3' in locals():
+        order3.process_order()
+        print(f"Остаток товара: {product1.quantity} шт.")
 
     print("\n=== Счетчики ===")
     print(f"Всего категорий: {Category.category_count}")
     print(f"Всего товаров: {Category.product_count}")
     print(f"Всего заказов: {Order.order_count}")
-
-    print("\n=== Тестирование метода new_product ===")
-
-    product_data = {
-        'name': 'Новый продукт',
-        'description': 'Описание нового продукта',
-        'price': 3000.0,
-        'quantity': 7
-    }
-
-    new_product = Product.new_product(product_data,
-                                      category.products_objects)
-    print(f"Создан новый продукт: {new_product}")
-
-    print("\n=== Проверка обработки дубликатов для смартфона ===")
-
-    duplicate_smartphone_data = {
-        'name': 'iPhone 15 Pro',
-        'description': 'Обновленное описание',
-        'price': 130000.0,
-        'quantity': 3,
-        'efficiency': 3.8,
-        'model': 'iPhone 15 Pro Max',
-        'memory': 512,
-        'color': 'Темный титан'
-    }
-
-    updated_smartphone = Smartphone.new_product(
-        duplicate_smartphone_data,
-        category.products_objects
-    )
-    print("После обработки дубликата смартфона:")
-    print(f"  Найденный продукт: {smartphone.name}")
-    print(f"  Новая цена: {smartphone.price} руб.")
-    print(f"  Новое количество: {smartphone.quantity} шт.")
-    print(f"  Новая модель: {smartphone.model}")
-    print(f"  Новая память: {smartphone.memory}GB")
-    print(f"  Новый цвет: {smartphone.color}")
